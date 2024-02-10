@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model comments {
+  commentid String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  postid    String? @db.Uuid
+  userid    String? @db.Uuid
+  body      String  @db.VarChar
+  date      BigInt
+  posts     posts?  @relation(fields: [postid], references: [postid], onDelete: NoAction, onUpdate: NoAction)
+  users     users?  @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model posts {
+  postid      String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userid      String?     @db.Uuid
+  subredditid String?     @db.Uuid
+  title       String      @db.VarChar
+  body        String?     @db.VarChar
+  img         String?     @db.VarChar
+  date        BigInt
+  comments    comments[]
+  subreddits  subreddits? @relation(fields: [subredditid], references: [subredditid], onDelete: NoAction, onUpdate: NoAction)
+  users       users?      @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+  votes       votes[]
+}
+
+model replies {
+  replayid  String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  commentid String  @db.Uuid
+  userid    String? @db.Uuid
+  body      String  @db.VarChar
+  date      BigInt
+  users     users?  @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model subreddits {
+  subredditid String   @id @db.Uuid
+  title       String   @unique @db.VarChar
+  users       String[] @db.Uuid
+  description String   @db.VarChar
+  posts       posts[]
+}
+
+model users {
+  userid   String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username String     @unique @db.VarChar
+  email    String     @unique @db.VarChar
+  comments comments[]
+  posts    posts[]
+  replies  replies[]
+  votes    votes[]
+}
+
+model votes {
+  voteid String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userid String? @db.Uuid
+  postid String? @db.Uuid
+  value  Int
+  posts  posts?  @relation(fields: [postid], references: [postid], onDelete: NoAction, onUpdate: NoAction)
+  users  users?  @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+}

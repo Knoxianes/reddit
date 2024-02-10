@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE users(
-    userID uuid PRIMARY KEY,
+    userID uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     username varchar NOT NULL UNIQUE,
     email varchar NOT NULL UNIQUE
 );
@@ -11,7 +11,7 @@ CREATE TABLE subreddits(
     description varchar NOT NULL
 );
 CREATE TABLE posts(
-    postID uuid PRIMARY KEY,
+    postID uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     userID uuid REFERENCES users(userID),
     subredditID uuid REFERENCES subreddits(subredditID),
     title varchar NOT NULL,
@@ -20,20 +20,21 @@ CREATE TABLE posts(
     date int8 NOT NULL
 );
 CREATE TABLE comments(
-    commentID uuid PRIMARY KEY,
+    commentID uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     postID uuid REFERENCES posts(postID),
     userID uuid REFERENCES users(userID),
     body varchar NOT NULL,
     date int8 NOT NULL
 );
 CREATE TABLE replies(
-    replayID uuid PRIMARY KEY,
+    replayID uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     commentID uuid NOT NULL,
     userID uuid REFERENCES users(userID),
     body varchar NOT NULL,
     date int8 NOT NULL
 );
 CREATE TABLE votes(
+    voteID uuid PRIMARY KEY  DEFAULT uuid_generate_v4(),
     userID uuid REFERENCES users(userID),
     postID uuid REFERENCES posts(postID),
     value int NOT NULL
