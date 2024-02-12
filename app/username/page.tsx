@@ -2,7 +2,7 @@ import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { registerUser, isRegistered } from "../../lib/actions";
 import { Roboto } from "next/font/google";
-import { SubmitButton } from "@/ui/submitButton";
+import { SubmitButton } from "@/components/ui/submitButton";
 
 const roboto = Roboto({
   weight: "400",
@@ -13,11 +13,11 @@ export default async function Page() {
   const user = await currentUser();
 
   if (!user) {
-    redirect("/");
+    redirect("/r");
   }
   const registered = await isRegistered(user.emailAddresses[0].emailAddress);
   if (registered) {
-    redirect("/");
+    redirect("/r");
   }
   return (
     <main className="flex flex-col gap-10 justify-center items-center w-screen h-screen">
