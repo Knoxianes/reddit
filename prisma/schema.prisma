@@ -42,21 +42,24 @@ model replies {
 }
 
 model subreddits {
-  subredditid String   @id @db.Uuid
+  subredditid String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   title       String   @unique @db.VarChar
-  users       String[] @db.Uuid
+  admin       String?  @db.Uuid
+  userids     String[] @db.Uuid
   description String   @db.VarChar
   posts       posts[]
+  users       users?   @relation(fields: [admin], references: [userid], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model users {
-  userid   String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  username String     @unique @db.VarChar
-  email    String     @unique @db.VarChar
-  comments comments[]
-  posts    posts[]
-  replies  replies[]
-  votes    votes[]
+  userid     String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username   String       @unique @db.VarChar
+  email      String       @unique @db.VarChar
+  comments   comments[]
+  posts      posts[]
+  replies    replies[]
+  subreddits subreddits[]
+  votes      votes[]
 }
 
 model votes {

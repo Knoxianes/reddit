@@ -5,9 +5,10 @@ CREATE TABLE users(
     email varchar NOT NULL UNIQUE
 );
 CREATE TABLE subreddits(
-    subredditID uuid PRIMARY KEY,
+    subredditID uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     title varchar NOT NULL unique,
-    users uuid[],
+    admin uuid REFERENCES users(userID),
+    userIDs uuid[],
     description varchar NOT NULL
 );
 CREATE TABLE posts(
