@@ -14,7 +14,7 @@ export async function POST(request: Request) {
                     mode: 'insensitive', // Case-insensitive search
                 },
             },
-            take: 3, // Limiting to 3 results
+            take: 5, // Limiting to 5 results
         });
         
         return Response.json(JSON.stringify(subreddits));
