@@ -1,5 +1,6 @@
 import { subreddits } from "@prisma/client";
 
+
 export async function fetchSearch(query: string): Promise<subreddits[]> {
     const response = await fetch("/api/search", {
         method: "POST",
@@ -11,6 +12,6 @@ export async function fetchSearch(query: string): Promise<subreddits[]> {
         })
     })
     const data = await response.json();
-    const ret:subreddits[] = JSON.parse(data);
+    const ret: subreddits[] = JSON.parse(data);
     return ret;
 }

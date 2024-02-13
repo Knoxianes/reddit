@@ -1,8 +1,7 @@
 'use server';
-import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
+import prisma from "@/db/db";
 
-const prisma = new PrismaClient();
 
 
 export async function registerUser(formData: FormData) {
@@ -31,9 +30,21 @@ export async function isRegistered(email: string) {
     const user = await prisma.users.findFirst({
         where: { email: email }
     })
-    if (user){
+    if (user) {
         return true
-    }else{
+    } else {
         return false
+    }
+}
+
+export async function fetchSubreddit(title: string) {
+    try {
+        const subreddit = await prisma.subreddits.findFirst({
+            where: { title: title }
+        });
+        return subreddit
+    } catch (error) {
+        console.log("Database error: ", error);
+        throw new Error();
     }
 }
