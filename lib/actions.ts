@@ -1,10 +1,12 @@
 'use server';
 import { redirect } from "next/navigation";
 import prisma from "@/db/db";
+import { feedPost } from "@/types";
+import { clerkClient } from "@clerk/nextjs";
 
 
 
-export async function registerUser(formData: FormData) {
+export async function registerUser(clerkID: string, formData: FormData) {
     const username = formData.get("username")?.toString();
     const email = formData.get("email")?.toString();
     if (!username || !email) {
@@ -17,12 +19,20 @@ export async function registerUser(formData: FormData) {
     if (userID) {
         throw new Error();
     }
-    await prisma.users.create({
+    const userid = await prisma.users.create({
         data: {
             username: username,
             email: email
+        },
+        select: {
+            userid: true
         }
     })
+    await clerkClient.users.updateUserMetadata(clerkID, {
+        privateMetadata: {
+            userID: userid
+        }
+    });
     redirect("/");
 }
 
@@ -49,20 +59,22 @@ export async function fetchSubreddit(title: string) {
     }
 }
 
+
+
 const randomArray = (length: number, max: number) =>
     Array(length).fill(0).map(() => Math.round(Math.random() * max))
 
-export async function fetchSubredditsForHome() {
+export async function fetchPostsForHome(userID?: string) {
     const count = await prisma.posts.count();
     const rowNumbers = randomArray(10, count);
 
-    const posts = rowNumbers.map(async (number) => {
+    const postPromises = rowNumbers.map(async (number) => {
         const post = await prisma.posts.findFirst({
             skip: number,
             take: 1,
-            include:{
+            include: {
                 subreddits: {
-                    select:{
+                    select: {
                         title: true,
                         subredditid: true,
                     }
@@ -70,7 +82,21 @@ export async function fetchSubredditsForHome() {
             },
 
         });
-        return post
+        const voteValue = await prisma.votes.aggregate({
+            where: {
+                postid: {
+                    equals: post?.postid
+                },
+            },
+            _sum: {
+                value: true
+            }
+
+        });
+
+
+        const ret = { ...post, votesValue: voteValue._sum.value }
+        return ret
     })
-    return await Promise.all(posts)
+    return await Promise.all(postPromises) as feedPost[];
 }

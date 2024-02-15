@@ -34,7 +34,7 @@ export default function FeedPost({ post }: props) {
                 <div className="flex flex-row gap-8">
                     <div className="bg-gray-700 rounded-full flex justify-center items-center px-3 py-1 gap-1 cursor-pointer">
                         <MdKeyboardDoubleArrowUp className="text-4xl transition hover:text-green-500" />
-                        <span className="text-2xl font-bold">400</span>
+                        <span className="text-2xl font-bold">{post?.votesValue ? post.votesValue : 0}</span>
                         <MdKeyboardDoubleArrowDown className="text-4xl transition hover:text-red-600" />
                     </div>
                     <div className="bg-gray-700 rounded-full flex justify-center items-center px-7 py-3 gap-3 cursor-pointer transition hover:bg-opacity-60">
@@ -49,7 +49,7 @@ export default function FeedPost({ post }: props) {
                 </div>
                 {
                     post?.img &&
-                        <img alt="Image from post" src={post.img} className="max-h-[70%] max-w-[70%]" />
+                    <img alt="Image from post" src={post.img} className="max-h-[70%] max-w-[70%]" />
                 }
             </div>
         </div>

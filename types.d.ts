@@ -6,4 +6,6 @@ type feedPost = {
         subredditid: string,
         title: string,
     } | null;
-} & posts
+} & posts & {
+    votesValue: number | null
+}
