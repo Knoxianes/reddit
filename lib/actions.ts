@@ -48,3 +48,29 @@ export async function fetchSubreddit(title: string) {
         throw new Error();
     }
 }
+
+const randomArray = (length: number, max: number) =>
+    Array(length).fill(0).map(() => Math.round(Math.random() * max))
+
+export async function fetchSubredditsForHome() {
+    const count = await prisma.posts.count();
+    const rowNumbers = randomArray(10, count);
+
+    const posts = rowNumbers.map(async (number) => {
+        const post = await prisma.posts.findFirst({
+            skip: number,
+            take: 1,
+            include:{
+                subreddits: {
+                    select:{
+                        title: true,
+                        subredditid: true,
+                    }
+                },
+            },
+
+        });
+        return post
+    })
+    return await Promise.all(posts)
+}

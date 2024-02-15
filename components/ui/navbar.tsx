@@ -16,15 +16,15 @@ export function Navbar() {
             <div className="h-24 hidden w-full md:flex md:items-center md:justify-start transition hover:translate-y-0.5">
                 <Link href={"/r"}><Image src={"/logo.png"} alt="logo" width={70} height={40} /></Link>
             </div>
-            <div className="w-full font-bold cursor-pointer transition hover:translate-y-0.5 flex items-center justify-center">
+            <Link href={{pathname: "/r", query:{feed:"home"}}} className="w-full font-bold cursor-pointer transition hover:translate-y-0.5 flex items-center justify-center">
                 HOME
-            </div>
+            </Link>
             <div className="col-span-3 md:col-span-8 w-full h-full flex justify-center items-center">
                 <Search />
             </div>
-            <div className="font-bold cursor-pointer transition hover:translate-y-0.5 flex items-center justify-end  w-full">
+            <Link href={{pathname: "/r", query:{feed:"explore"}}} className="font-bold cursor-pointer transition hover:translate-y-0.5 flex items-center justify-end  w-full">
                 EXPLORE
-            </div>
+            </Link>
             <div className="w-full flex justify-end items-center ">
                 <Profile />
             </div>
