@@ -1,7 +1,7 @@
 import { authMiddleware } from "@clerk/nextjs";
 
 export default authMiddleware({
-  publicRoutes: ["/","/r","/u"]
+  publicRoutes: ["/","/r","/u","/api/posts"]
 });
 // export default function Middleware(){
 // };

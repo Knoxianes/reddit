@@ -9,13 +9,16 @@ datasource db {
 }
 
 model comments {
-  commentid String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  postid    String? @db.Uuid
-  userid    String? @db.Uuid
-  body      String  @db.VarChar
-  date      BigInt
-  posts     posts?  @relation(fields: [postid], references: [postid], onDelete: NoAction, onUpdate: NoAction)
-  users     users?  @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+  commentid      String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  postid         String?    @db.Uuid
+  userid         String?    @db.Uuid
+  parent_comment String?    @db.Uuid
+  body           String     @db.VarChar
+  date           DateTime   @default(now()) @db.Timestamp(6)
+  comments       comments?  @relation("commentsTocomments", fields: [parent_comment], references: [commentid], onDelete: NoAction, onUpdate: NoAction)
+  other_comments comments[] @relation("commentsTocomments")
+  posts          posts?     @relation(fields: [postid], references: [postid], onDelete: NoAction, onUpdate: NoAction)
+  users          users?     @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model posts {
@@ -30,15 +33,6 @@ model posts {
   subreddits  subreddits? @relation(fields: [subredditid], references: [subredditid], onDelete: NoAction, onUpdate: NoAction)
   users       users?      @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
   votes       votes[]
-}
-
-model replies {
-  replayid  String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  commentid String  @db.Uuid
-  userid    String? @db.Uuid
-  body      String  @db.VarChar
-  date      BigInt
-  users     users?  @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model subreddits {
@@ -57,7 +51,6 @@ model users {
   email      String       @unique @db.VarChar
   comments   comments[]
   posts      posts[]
-  replies    replies[]
   subreddits subreddits[]
   votes      votes[]
 }
@@ -70,3 +63,4 @@ model votes {
   posts  posts?  @relation(fields: [postid], references: [postid], onDelete: NoAction, onUpdate: NoAction)
   users  users?  @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
 }
+

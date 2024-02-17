@@ -1,4 +1,4 @@
-import { fetchSubreddit } from "@/lib/actions";
+import { fetchSubreddit } from "@/lib/data";
 import { notFound } from "next/navigation";
 
 

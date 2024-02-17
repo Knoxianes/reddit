@@ -7,5 +7,8 @@ type feedPost = {
         title: string,
     } | null;
 } & posts & {
-    votesValue: number | null
+    votesSum: number | null
+    voteValue: number | null
+    commentCount: number | null
 }
+

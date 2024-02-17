@@ -32,14 +32,14 @@ export default function FeedPost({ post }: props) {
                     {post?.title}
                 </div>
                 <div className="flex flex-row gap-8">
-                    <div className="bg-gray-700 rounded-full flex justify-center items-center px-3 py-1 gap-1 cursor-pointer">
-                        <MdKeyboardDoubleArrowUp className="text-4xl transition hover:text-green-500" />
-                        <span className="text-2xl font-bold">{post?.votesValue ? post.votesValue : 0}</span>
-                        <MdKeyboardDoubleArrowDown className="text-4xl transition hover:text-red-600" />
+                    <div className="bg-gray-700 rounded-full flex justify-center items-center w-32 px-3 py-1 gap-1 cursor-pointer">
+                        <MdKeyboardDoubleArrowUp className={`text-4xl transition ${post?.voteValue! > 0 ? "text-green-600 hover:text-gray-300" : "hover:text-green-600"}`} />
+                        <span className="text-2xl font-bold">{post?.votesSum ? post.votesSum : 0}</span>
+                        <MdKeyboardDoubleArrowDown className={`text-4xl transition ${post?.voteValue! < 0 ? "text-red-600 hover:text-gray-300" : "hover:text-red-600"}`} />
                     </div>
-                    <div className="bg-gray-700 rounded-full flex justify-center items-center px-7 py-3 gap-3 cursor-pointer transition hover:bg-opacity-60">
+                    <div className="bg-gray-700 rounded-full flex w-32 justify-center items-center px-3 py-3 gap-3 cursor-pointer transition hover:bg-opacity-60">
                         <FaRegCommentAlt className="text-3xl" />
-                        <span className="text-2xl font-bold">50</span>
+                        <span className="text-2xl font-bold">{post?.commentCount ? post.commentCount : 0}</span>
                     </div>
                 </div>
             </div>

@@ -36,37 +36,13 @@ export async function registerUser(clerkID: string, formData: FormData) {
     redirect("/");
 }
 
-export async function isRegistered(email: string) {
-    const user = await prisma.users.findFirst({
-        where: { email: email }
-    })
-    if (user) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export async function fetchSubreddit(title: string) {
-    try {
-        const subreddit = await prisma.subreddits.findFirst({
-            where: { title: title }
-        });
-        return subreddit
-    } catch (error) {
-        console.log("Database error: ", error);
-        throw new Error();
-    }
-}
-
-
-
 const randomArray = (length: number, max: number) =>
     Array(length).fill(0).map(() => Math.round(Math.random() * max))
 
 export async function fetchPostsForHome(userID?: string) {
     const count = await prisma.posts.count();
-    const rowNumbers = randomArray(10, count);
+    const rowNumbers = randomArray(20, count);
+
 
     const postPromises = rowNumbers.map(async (number) => {
         const post = await prisma.posts.findFirst({
@@ -79,10 +55,16 @@ export async function fetchPostsForHome(userID?: string) {
                         subredditid: true,
                     }
                 },
-            },
+                _count: {
+                    select: {
+                        comments: true,
+                    },
+                },
+            }
+
 
         });
-        const voteValue = await prisma.votes.aggregate({
+        const votesSum = await prisma.votes.aggregate({
             where: {
                 postid: {
                     equals: post?.postid
@@ -93,10 +75,27 @@ export async function fetchPostsForHome(userID?: string) {
             }
 
         });
+        let voteValue = null;
+        if (userID) {
+            voteValue = await prisma.votes.findFirst({
+                where: {
+                    postid: {
+                        equals: post?.postid
+                    },
+                    userid: {
+                        equals: userID,
+                    }
+                },
+                select: {
+                    value: true
+                }
+            });
 
+        }
 
-        const ret = { ...post, votesValue: voteValue._sum.value }
+        const ret = { ...post, votesSum: votesSum._sum.value, voteValue: voteValue?.value, commentCount: post?._count?.comments }
         return ret
     })
-    return await Promise.all(postPromises) as feedPost[];
+    const posts = await Promise.all(postPromises) as feedPost[];
+    return posts
 }

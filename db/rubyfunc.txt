@@ -1,0 +1,8 @@
+  random_length = rand(1..200)
+  # Check if the string is already shorter than the random length
+  if this.length <= random_length
+    return this
+  else
+    # Reduce the string to the random length using slice
+    return this.slice(0, random_length)
+  end
