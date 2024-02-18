@@ -10,7 +10,7 @@ import FeedPost from "./feedPost";
 type props = {
     className?: string,
     initialPosts: (feedPost | null)[],
-    userID: string
+    userID: string | null | undefined 
 }
 
 
@@ -34,7 +34,7 @@ export default function InfiniteScroll({ className, initialPosts, userID }: prop
         <div className={className}>
             {
                 posts?.map((post: feedPost | null, index: number) => post &&
-                    <div key={post ? post.postid + index : "post" + index} 
+                    <div key={post ? post.postid + index : "post" + index}
                         className=" rounded-3xl transition  hover:bg-gray-800" >
                         <FeedPost userID={userID} post={post} />
                         <hr className="border-gray-700" />

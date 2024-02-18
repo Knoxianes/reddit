@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/db/db";
 import { feedPost } from "@/types";
 import { clerkClient } from "@clerk/nextjs";
+import { sql } from '@vercel/postgres';
 
 
 
@@ -39,7 +40,7 @@ export async function registerUser(clerkID: string, formData: FormData) {
 const randomArray = (length: number, max: number) =>
     Array(length).fill(0).map(() => Math.round(Math.random() * max))
 
-export async function fetchPostsForHome(userID?: string) {
+export async function fetchPostsForHome(userID?: string | null | undefined) {
     const count = await prisma.posts.count();
     const rowNumbers = randomArray(20, count);
 
@@ -80,21 +81,8 @@ export async function fetchPostsForHome(userID?: string) {
         let vote = null;
         let joinedSubreddit = null;
         if (userID) {
-            vote = await prisma.votes.findFirst({
-                where: {
-                    postid: {
-                        equals: post?.postid
-                    },
-                    userid: {
-                        equals: userID,
-                    }
-                },
-                select: {
-                    value: true,
-                    voteid: true,
-                }
-            });
-
+            vote = await  sql`
+                `;
             joinedSubreddit = post?.subreddits?.userids?.includes(userID);
         }
 
@@ -114,7 +102,7 @@ export async function updatePost(userID: string, postID: string, value: number) 
         data: {
             value: value
         }
-    })
+    });
 }
 export async function deletePost(userID: string, postID: string) {
     await prisma.votes.updateMany({
@@ -125,7 +113,7 @@ export async function deletePost(userID: string, postID: string) {
         data: {
             value: 0
         }
-    })
+    }).then(() => console.log("updated"));
 
 }
 export async function createPost(userID: string, postID: string, value: number) {
@@ -140,15 +128,15 @@ export async function createPost(userID: string, postID: string, value: number) 
 
     });
     if (vote) {
-       await updatePost(userID,postID,value); 
-    
-    }else{
+        await updatePost(userID, postID, value);
+
+    } else {
         await prisma.votes.create({
-            data:{
+            data: {
                 userid: userID,
                 postid: postID,
                 value: value
             }
         })
-    }
+    };
 }

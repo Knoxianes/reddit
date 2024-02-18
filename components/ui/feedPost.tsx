@@ -9,7 +9,7 @@ import { MdKeyboardDoubleArrowDown } from "react-icons/md";
 
 type props = {
     post: feedPost,
-    userID: string,
+    userID: string | null | undefined,
 }
 
 const font = Roboto({
@@ -31,26 +31,26 @@ export default function FeedPost({ post, userID }: props) {
     const onClickUpVote = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         e.preventDefault();
-        if(!post.userid){
+        if (!userID) {
             return
         }
         if (upVoted) {
             setUpdating(true);
-            await deletePost(post.userid!, post.postid).finally(() => setUpdating(false));
+            await deletePost(userID, post.postid).finally(() => setUpdating(false));
             setUpVoted(false);
             setVoteSum(voteSum - 1);
             return;
         }
         if (downVoted) {
             setUpdating(true);
-            await updatePost(post.userid,post.postid,1).finally(()=>setUpdating(false));
+            await updatePost(userID, post.postid, 1).finally(() => setUpdating(false));
             setUpVoted(true);
             setDownVoted(false);
             setVoteSum(voteSum + 2);
             return;
         }
         setUpdating(true);
-        await createPost(post.userid,post.postid,1).finally(()=>setUpdating(false));
+        await createPost(userID, post.postid, 1).finally(() => setUpdating(false));
         setUpVoted(true);
         setVoteSum(voteSum + 1);
 
@@ -58,26 +58,26 @@ export default function FeedPost({ post, userID }: props) {
     const onClickDownVote = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         e.preventDefault();
-        if(!post.userid){
+        if (!userID) {
             return
         }
         if (downVoted) {
             setUpdating(true);
-            await deletePost(post.userid, post.postid).finally(() => setUpdating(false));
+            await deletePost(userID, post.postid).finally(() => setUpdating(false));
             setDownVoted(false);
             setVoteSum(voteSum + 1);
             return;
         }
         if (upVoted) {
             setUpdating(true);
-            await updatePost(post.userid,post.postid,-1).finally(()=>setUpdating(false));
+            await updatePost(userID, post.postid, -1).finally(() => setUpdating(false));
             setDownVoted(true);
             setUpVoted(false);
             setVoteSum(voteSum - 2);
             return;
         }
         setUpdating(true);
-        await createPost(post.userid,post.postid,-1).finally(()=>setUpdating(false));
+        await createPost(userID, post.postid, -1).finally(() => setUpdating(false));
         setDownVoted(true);
         setVoteSum(voteSum - 1);
 
@@ -99,9 +99,12 @@ export default function FeedPost({ post, userID }: props) {
                     </div>
                 </div>
                 <div className="w-full pl-4 flex flex-col gap-4 text-4xl font-medium" >
-                    <div className={`${post.body ? font2.className : font.className}`}>
-                        {post.title.length > 70 ? post?.title.slice(0, 70) + "..." : post?.title}
-                    </div>
+                    {post.title &&
+                        <div className={`${post.body ? font2.className : font.className}`}>
+
+                            {post.title.length > 70 ? post.title.slice(0, 70) + "..." : post.title}
+                        </div>
+                    }
                     {post.body &&
                         <p className="w-full text-3xl text-justify">
                             {post.body?.length > 200 ? post.body.slice(0, 200) + "..." : post?.body}
@@ -110,9 +113,16 @@ export default function FeedPost({ post, userID }: props) {
                 </div>
                 <div className="flex flex-row gap-8">
                     <div className="bg-gray-700 rounded-full flex justify-center items-center w-32 px-3 py-1 gap-1 cursor-pointer">
-                        <button className="z-10 " disabled={updating} onClick={onClickUpVote}><MdKeyboardDoubleArrowUp className={`text-4xl transition ${upVoted ? "text-green-600 hover:text-gray-300" : "hover:text-green-600"}`} /></button>
-                        <span className="text-2xl font-bold">{voteSum}</span>
-                        <button className="z-10" disabled={updating} onClick={onClickDownVote}><MdKeyboardDoubleArrowDown className={`text-4xl transition ${downVoted ? "text-red-600 hover:text-gray-300" : "hover:text-red-600"}`} /></button>
+                        {!updating &&
+                            <>
+                                <button className="z-10 " onClick={onClickUpVote}><MdKeyboardDoubleArrowUp className={`text-4xl transition ${upVoted ? "text-green-600 hover:text-gray-300" : "hover:text-green-600"}`} /></button>
+                                <span className="text-2xl font-bold">{voteSum}</span>
+                                <button className="z-10" onClick={onClickDownVote}><MdKeyboardDoubleArrowDown className={`text-4xl transition ${downVoted ? "text-red-600 hover:text-gray-300" : "hover:text-red-600"}`} /></button>
+                            </>
+                        }{
+                            updating &&
+                            <span className="loader h-8 w-8"></span>
+                        }
                     </div>
                     <div className="bg-gray-700 rounded-full flex w-32 justify-center items-center px-3 py-3 gap-3 cursor-pointer transition hover:bg-opacity-60">
                         <FaRegCommentAlt className="text-3xl" />
