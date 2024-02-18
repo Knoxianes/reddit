@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import prisma from "@/db/db";
 import { feedPost } from "@/types";
 import { clerkClient } from "@clerk/nextjs";
-import { sql } from '@vercel/postgres';
 
 
 
@@ -31,7 +30,7 @@ export async function registerUser(clerkID: string, formData: FormData) {
     })
     await clerkClient.users.updateUserMetadata(clerkID, {
         privateMetadata: {
-            userID: userid
+            userID: userid.userid
         }
     });
     redirect("/");
@@ -40,7 +39,7 @@ export async function registerUser(clerkID: string, formData: FormData) {
 const randomArray = (length: number, max: number) =>
     Array(length).fill(0).map(() => Math.round(Math.random() * max))
 
-export async function fetchPostsForHome(userID?: string | null | undefined) {
+export async function fetchPostsForHome(userID: string | null | undefined) {
     const count = await prisma.posts.count();
     const rowNumbers = randomArray(20, count);
 
@@ -81,8 +80,21 @@ export async function fetchPostsForHome(userID?: string | null | undefined) {
         let vote = null;
         let joinedSubreddit = null;
         if (userID) {
-            vote = await  sql`
-                `;
+            vote = await prisma.votes.findFirst({
+                where: {
+                    postid: {
+                        equals: post?.postid
+                        
+                    },
+                    userid: {
+                        equals: userID,
+                    }
+                },
+                select: {
+                    value: true,
+                    voteid: true,
+                }
+            });
             joinedSubreddit = post?.subreddits?.userids?.includes(userID);
         }
 
