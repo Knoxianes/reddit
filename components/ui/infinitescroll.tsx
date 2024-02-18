@@ -33,9 +33,10 @@ export default function InfiniteScroll({ className, initialPosts, userID }: prop
     return (
         <div className={className}>
             {
-                posts?.map((post: feedPost | null, index: number) =>
-                    <div key={post ? post.postid + index : "post" + index} className=" rounded-3xl transition  hover:bg-gray-800" >
-                        <FeedPost post={post} />
+                posts?.map((post: feedPost | null, index: number) => post &&
+                    <div key={post ? post.postid + index : "post" + index} 
+                        className=" rounded-3xl transition  hover:bg-gray-800" >
+                        <FeedPost userID={userID} post={post} />
                         <hr className="border-gray-700" />
                     </div>
                 )

@@ -53,6 +53,7 @@ export async function fetchPostsForHome(userID?: string) {
                     select: {
                         title: true,
                         subredditid: true,
+                        userids: true
                     }
                 },
                 _count: {
@@ -64,6 +65,7 @@ export async function fetchPostsForHome(userID?: string) {
 
 
         });
+
         const votesSum = await prisma.votes.aggregate({
             where: {
                 postid: {
@@ -75,9 +77,10 @@ export async function fetchPostsForHome(userID?: string) {
             }
 
         });
-        let voteValue = null;
+        let vote = null;
+        let joinedSubreddit = null;
         if (userID) {
-            voteValue = await prisma.votes.findFirst({
+            vote = await prisma.votes.findFirst({
                 where: {
                     postid: {
                         equals: post?.postid
@@ -87,15 +90,65 @@ export async function fetchPostsForHome(userID?: string) {
                     }
                 },
                 select: {
-                    value: true
+                    value: true,
+                    voteid: true,
                 }
             });
 
+            joinedSubreddit = post?.subreddits?.userids?.includes(userID);
         }
 
-        const ret = { ...post, votesSum: votesSum._sum.value, voteValue: voteValue?.value, commentCount: post?._count?.comments }
+        const ret = { ...post, votesSum: votesSum._sum.value, vote: vote, commentCount: post?._count?.comments, userJoinedSubreddit: joinedSubreddit }
         return ret
     })
     const posts = await Promise.all(postPromises) as feedPost[];
     return posts
+}
+
+export async function updatePost(userID: string, postID: string, value: number) {
+    await prisma.votes.updateMany({
+        where: {
+            userid: userID,
+            postid: postID
+        },
+        data: {
+            value: value
+        }
+    })
+}
+export async function deletePost(userID: string, postID: string) {
+    await prisma.votes.updateMany({
+        where: {
+            userid: userID,
+            postid: postID
+        },
+        data: {
+            value: 0
+        }
+    })
+
+}
+export async function createPost(userID: string, postID: string, value: number) {
+    const vote = await prisma.votes.findFirst({
+        where: {
+            userid: userID,
+            postid: postID
+        },
+        select: {
+            voteid: true
+        },
+
+    });
+    if (vote) {
+       await updatePost(userID,postID,value); 
+    
+    }else{
+        await prisma.votes.create({
+            data:{
+                userid: userID,
+                postid: postID,
+                value: value
+            }
+        })
+    }
 }
