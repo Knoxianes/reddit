@@ -147,7 +147,7 @@ export default function FeedPost({ post, userID }: props) {
             </div>
             <div className={`w-1/4 flex flex-col ${joinedSubreddit || !userID ? "justify-center" : ""} items-end gap-10`}>
                 {!joinedSubreddit && userID &&
-                    <button onClick className="rounded-full font-normal bg-green-800 w-fit text-2xl py-2 px-7 flex justify-center items-center cursor-pointer hover:bg-opacity-60" style={font.style}>
+                    <button onClick={onClickJoin} className="rounded-full font-normal bg-green-800 w-fit text-2xl py-2 px-7 flex justify-center items-center cursor-pointer hover:bg-opacity-60" style={font.style}>
                         Join
                     </button>
                 }
