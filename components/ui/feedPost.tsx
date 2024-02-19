@@ -26,12 +26,14 @@ export default function FeedPost({ post, userID }: props) {
     const [downVoted, setDownVoted] = useState(post.vote?.value! < 0);
     const [voteSum, setVoteSum] = useState(post.votesSum ? post.votesSum : 0);
     const [updating, setUpdating] = useState(false);
+    const [joinedSubreddit, setJoinedSubreddit] = useState(post.userJoinedSubreddit);
 
 
     const onClickUpVote = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         e.preventDefault();
         if (!userID) {
+            location.href = "/sign-in";
             return
         }
         if (upVoted) {
@@ -59,6 +61,7 @@ export default function FeedPost({ post, userID }: props) {
         e.stopPropagation();
         e.preventDefault();
         if (!userID) {
+            location.href = "/sign-in";
             return
         }
         if (downVoted) {
@@ -80,6 +83,18 @@ export default function FeedPost({ post, userID }: props) {
         await createPost(userID, post.postid, -1).finally(() => setUpdating(false));
         setDownVoted(true);
         setVoteSum(voteSum - 1);
+
+    }
+
+    const onClickJoin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!userID) {
+            location.href = "/sign-in";
+            return
+        }
+
+
 
     }
 
@@ -130,9 +145,9 @@ export default function FeedPost({ post, userID }: props) {
                     </div>
                 </div>
             </div>
-            <div className={`w-1/4 flex flex-col ${post.userJoinedSubreddit || !userID ? "justify-center" : ""} items-end gap-10`}>
-                {!post.userJoinedSubreddit && userID &&
-                    <button className="rounded-full font-normal bg-green-800 w-fit text-2xl py-2 px-7 flex justify-center items-center cursor-pointer hover:bg-opacity-60" style={font.style}>
+            <div className={`w-1/4 flex flex-col ${joinedSubreddit || !userID ? "justify-center" : ""} items-end gap-10`}>
+                {!joinedSubreddit && userID &&
+                    <button onClick className="rounded-full font-normal bg-green-800 w-fit text-2xl py-2 px-7 flex justify-center items-center cursor-pointer hover:bg-opacity-60" style={font.style}>
                         Join
                     </button>
                 }
