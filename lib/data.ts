@@ -42,3 +42,16 @@ export async function fetchSubreddit(title: string) {
     }
 }
 
+export async function fetchPost(postID: string) {
+    try {
+
+        return await prisma.posts.findFirst({
+            where: {
+                postid: postID
+            }
+        });
+    } catch (error) {
+        console.log("Database error: ", error);
+        throw new Error();
+    }
+}

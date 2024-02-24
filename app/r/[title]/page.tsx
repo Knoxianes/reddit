@@ -7,8 +7,9 @@ export default async function Page({ params }: { params: { title: string } }) {
   const subreddit = await fetchSubreddit(title);
   if (!subreddit) notFound();
   return (
-    <div>
-      {title}
+    <div className="w-full flex flex-row ">
+      <div>
+      </div>
     </div>
     
   )
